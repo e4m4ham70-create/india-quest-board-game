@@ -72,7 +72,7 @@ const teamTemplate = [
     color: "bg-rose-500",
     ringColor: "ring-rose-300",
     textColor: "text-rose-600",
-    icon: "🐘",
+    icon: "🫕",
     powerUp: "score",
   },
   {
@@ -84,7 +84,7 @@ const teamTemplate = [
     color: "bg-orange-500",
     ringColor: "ring-orange-300",
     textColor: "text-orange-600",
-    icon: "🪷",
+    icon: "🥗",
     powerUp: "jump",
   },
   {
@@ -96,7 +96,7 @@ const teamTemplate = [
     color: "bg-blue-500",
     ringColor: "ring-blue-300",
     textColor: "text-blue-600",
-    icon: "🦚",
+    icon: "🍲",
     powerUp: "shield",
   },
   {
@@ -108,7 +108,7 @@ const teamTemplate = [
     color: "bg-amber-500",
     ringColor: "ring-amber-300",
     textColor: "text-amber-600",
-    icon: "🌶️",
+    icon: "🌮",
     powerUp: "double",
   },
   {
@@ -120,7 +120,7 @@ const teamTemplate = [
     color: "bg-purple-500",
     ringColor: "ring-purple-300",
     textColor: "text-purple-600",
-    icon: "🏰",
+    icon: "🍕",
     powerUp: "steal",
   },
   {
@@ -132,7 +132,7 @@ const teamTemplate = [
     color: "bg-emerald-500",
     ringColor: "ring-emerald-300",
     textColor: "text-emerald-600",
-    icon: "🪔",
+    icon: "🍚",
     powerUp: "swap",
   },
 ];
@@ -144,7 +144,8 @@ function makeDefaultQuestions() {
     teamName: team.name,
     questions: Array.from(
       { length: QUESTIONS_PER_TEAM },
-      (_, index) => `${team.name} ${index + 1}번 질문을 입력하세요.`
+      (_, index) =>
+        `${team.name} ${index + 1}번: 세계 음식 글을 읽고 영어 질문을 만들어 보세요.`
     ),
   }));
 }
@@ -446,37 +447,23 @@ function TeamToken({ team, active, indexOnCell, totalOnCell }) {
   );
 }
 
-function IndiaBoard({ boardEvents, teams, turn }) {
+function WorldFoodBoard({ boardEvents, teams, turn }) {
   const pathPoints = boardPath.map((point) => `${point.x},${point.y}`).join(" ");
   const cells = Array.from({ length: BOARD_SIZE }, (_, i) => i + 1);
   const startTeams = teams.filter((team) => team.position === 0);
 
   return (
-    <div className="relative h-[600px] overflow-hidden rounded-[2rem] border-8 border-orange-100 bg-orange-900 shadow-2xl">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_5%,rgba(255,247,237,0.92),transparent_26%),linear-gradient(160deg,rgba(251,146,60,0.95),rgba(245,158,11,0.75)_34%,rgba(20,184,166,0.72)_70%,rgba(88,28,135,0.85))]" />
-      <div className="absolute inset-0 opacity-20 bg-[repeating-radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.8)_0_2px,transparent_3px_20px)]" />
-
-      <div className="absolute left-1/2 top-6 -translate-x-1/2 text-center text-white/95 drop-shadow-2xl">
-        <div className="text-6xl">🕌</div>
-        <div className="mt-1 text-base font-black tracking-[0.35em]">
-          INDIA QUEST
-        </div>
-      </div>
-
-      <div className="absolute left-8 top-16 text-5xl opacity-80 drop-shadow-xl">
-        🐘
-      </div>
-      <div className="absolute right-10 top-20 text-5xl opacity-80 drop-shadow-xl">
-        🦚
-      </div>
-      <div className="absolute bottom-8 left-10 text-6xl opacity-90 drop-shadow-xl">
-        🪷
-      </div>
-      <div className="absolute bottom-8 right-12 text-6xl opacity-90 drop-shadow-xl">
-        🪔
-      </div>
-
-      <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-orange-950/35 to-transparent" />
+    <div
+      className="relative h-[600px] overflow-hidden rounded-[2rem] border-8 border-amber-100 bg-[#f7f0df] shadow-2xl"
+      style={{
+        backgroundImage: "url('/world-food-board.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
+      <div className="absolute inset-0 bg-white/10" />
+      <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-amber-950/15 to-transparent" />
 
       <div className="absolute bottom-5 left-5 z-30 rounded-3xl border-4 border-white/80 bg-white/90 px-4 py-3 shadow-xl">
         <p className="text-xs font-black text-orange-900">START</p>
@@ -599,7 +586,7 @@ function EventModal({ event, currentTeam, onSuccess, onFail, onClose }) {
           exit={{ y: 40, scale: 0.92, opacity: 0 }}
           className="w-full max-w-3xl overflow-hidden rounded-[2.5rem] border-8 border-white bg-white shadow-2xl"
         >
-          <div className="bg-gradient-to-r from-orange-500 via-amber-500 to-teal-500 p-6 text-white">
+          <div className="bg-gradient-to-r from-orange-500 via-amber-400 to-emerald-600 p-6 text-white">
             <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="text-sm font-black uppercase tracking-[0.35em] opacity-90">
@@ -674,7 +661,194 @@ function EventModal({ event, currentTeam, onSuccess, onFail, onClose }) {
   );
 }
 
-export default function IndiaQuestBoardGame() {
+
+function VictoryModal({
+  winnerTeam,
+  teams,
+  onReplay,
+  onBackToSetup,
+}) {
+  if (!winnerTeam) return null;
+
+  const finalRanking = [...teams].sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score;
+    return b.position - a.position;
+  });
+
+  const winReason =
+    winnerTeam.position >= BOARD_SIZE
+      ? "FINISH 칸에 도착했습니다!"
+      : `${WIN_SCORE}점을 달성했습니다!`;
+
+  const confetti = ["🎉", "✨", "🌮", "🍕", "🍲", "🥗", "🫕", "🌎"];
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-slate-950/75 p-4 backdrop-blur-md"
+      >
+        {confetti.map((item, index) => (
+          <motion.div
+            key={`${item}-${index}`}
+            className="pointer-events-none absolute text-4xl md:text-5xl"
+            initial={{
+              opacity: 0,
+              x: `${12 + index * 11}vw`,
+              y: "-10vh",
+              rotate: 0,
+            }}
+            animate={{
+              opacity: [0, 1, 1, 0],
+              y: ["-10vh", "20vh", "65vh", "110vh"],
+              rotate: [0, 90, 220, 360],
+            }}
+            transition={{
+              duration: 4.5 + (index % 3) * 0.8,
+              delay: index * 0.12,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+          >
+            {item}
+          </motion.div>
+        ))}
+
+        <motion.div
+          initial={{ y: 50, scale: 0.85, opacity: 0 }}
+          animate={{ y: 0, scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 150, damping: 16 }}
+          className="relative z-10 w-full max-w-3xl overflow-hidden rounded-[2.5rem] border-8 border-white bg-[#fffaf0] shadow-2xl"
+        >
+          <div className="bg-gradient-to-r from-orange-500 via-amber-400 to-emerald-600 px-6 py-5 text-center text-white">
+            <p className="text-xs font-black uppercase tracking-[0.4em] md:text-sm">
+              World Food Quest Complete!
+            </p>
+            <div className="mt-3 text-6xl drop-shadow-xl md:text-7xl">
+              🏆
+            </div>
+          </div>
+
+          <div className="space-y-5 p-6 md:p-8">
+            <div className="text-center">
+              <motion.div
+                animate={{ y: [0, -8, 0], rotate: [-2, 2, -2] }}
+                transition={{ duration: 1.6, repeat: Infinity }}
+                className="mx-auto flex h-24 w-24 items-center justify-center rounded-full border-8 border-white text-5xl shadow-xl"
+                style={{
+                  background:
+                    "linear-gradient(135deg,#fde68a,#fdba74,#86efac)",
+                }}
+              >
+                {winnerTeam.icon}
+              </motion.div>
+
+              <h2 className="mt-4 text-4xl font-black text-orange-950 md:text-5xl">
+                {winnerTeam.name}
+              </h2>
+              <p className="mt-2 text-2xl font-black text-emerald-700">
+                Congratulations! 🎉
+              </p>
+              <p className="mt-2 text-base font-bold text-slate-600">
+                {winReason}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-3xl bg-orange-50 p-4 text-center shadow-inner">
+                <p className="text-xs font-black uppercase tracking-widest text-orange-700">
+                  Final Score
+                </p>
+                <p className="mt-1 text-4xl font-black text-orange-950">
+                  {winnerTeam.score}
+                </p>
+              </div>
+
+              <div className="rounded-3xl bg-emerald-50 p-4 text-center shadow-inner">
+                <p className="text-xs font-black uppercase tracking-widest text-emerald-700">
+                  Position
+                </p>
+                <p className="mt-1 text-4xl font-black text-emerald-950">
+                  {winnerTeam.position >= BOARD_SIZE
+                    ? "FINISH"
+                    : winnerTeam.position}
+                </p>
+              </div>
+            </div>
+
+            <div className="rounded-3xl border border-amber-200 bg-white p-4 shadow-sm">
+              <div className="mb-3 flex items-center justify-between">
+                <h3 className="font-black text-orange-950">Final Results</h3>
+                <span className="text-xs font-bold text-slate-500">
+                  점수 → 위치 순
+                </span>
+              </div>
+
+              <div className="space-y-2">
+                {finalRanking.map((team, index) => (
+                  <div
+                    key={team.id}
+                    className={`flex items-center justify-between rounded-2xl px-3 py-2 ${
+                      team.id === winnerTeam.id
+                        ? "bg-amber-100 ring-2 ring-amber-300"
+                        : "bg-slate-50"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="w-7 text-center font-black text-slate-500">
+                        {index + 1}
+                      </span>
+                      <span className="text-xl">{team.icon}</span>
+                      <span className="font-black text-slate-800">
+                        {team.name}
+                      </span>
+                    </div>
+                    <div className="text-right text-sm font-bold text-slate-600">
+                      <span className="mr-3">{team.score}점</span>
+                      <span>
+                        {team.position >= BOARD_SIZE
+                          ? "FINISH"
+                          : `${team.position}칸`}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <p className="text-center text-sm font-bold text-slate-600">
+              Great job! 세계 음식에 대해 읽고, 질문하고, 함께 답하며
+              World Food Quest를 완성했습니다.
+            </p>
+
+            <div className="grid gap-3 md:grid-cols-2">
+              <Button
+                onClick={onReplay}
+                className="h-14 rounded-2xl bg-orange-600 text-base font-black shadow-lg hover:bg-orange-700"
+              >
+                <RotateCcw className="mr-2 h-5 w-5" />
+                같은 질문으로 한 번 더
+              </Button>
+
+              <Button
+                onClick={onBackToSetup}
+                variant="outline"
+                className="h-14 rounded-2xl border-2 border-emerald-300 bg-emerald-50 text-base font-black text-emerald-800 hover:bg-emerald-100"
+              >
+                <Settings className="mr-2 h-5 w-5" />
+                설정 화면으로
+              </Button>
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
+export default function WorldFoodQuestBoardGame() {
   const initialView = getInitialView();
 
   const [viewMode] = useState(initialView.mode);
@@ -687,7 +861,7 @@ export default function IndiaQuestBoardGame() {
   const [dice, setDice] = useState(null);
   const [rollingDice, setRollingDice] = useState(false);
   const [message, setMessage] = useState(
-    "팀별 링크를 배분하고, 질문과 Bonus 설정을 완료하세요."
+    "팀별 링크를 배분하고, 세계 음식 질문 2개와 Bonus 설정을 완료하세요."
   );
   const [currentEvent, setCurrentEvent] = useState(null);
   const [hasMoved, setHasMoved] = useState(false);
@@ -705,6 +879,7 @@ export default function IndiaQuestBoardGame() {
   const teamOnlyIndex = teams.findIndex((team) => team.code === teamCode);
   const isTeamView = viewMode === "team";
   const currentTeam = teams[turn];
+  const winnerTeam = winner ? teams.find((team) => team.name === winner) : null;
 
   const totalQuestions = teamQuestions.reduce(
     (sum, team) => sum + team.questions.filter((q) => q.trim()).length,
@@ -899,8 +1074,6 @@ export default function IndiaQuestBoardGame() {
   };
 
   const submitTeamQuestions = async (teamIndex) => {
-    alert("submitTeamQuestions 함수 실행됨");
-
     const team = teams[teamIndex];
     const teamQuestion = teamQuestions[teamIndex];
 
@@ -931,8 +1104,6 @@ export default function IndiaQuestBoardGame() {
           : item
       )
     );
-
-    alert("화면 상태 변경 완료. 이제 Supabase 저장을 시도합니다.");
 
     const payload = {
       team_code: team.code,
@@ -1022,7 +1193,7 @@ export default function IndiaQuestBoardGame() {
   const startGame = () => {
     if (!setupReady) {
       setMessage(
-        "각 팀은 질문 2개를 입력한 뒤 제출 버튼을 눌러야 게임을 시작할 수 있습니다."
+        "각 팀은 세계 음식 글을 바탕으로 영어 질문 2개를 작성하고 제출해야 게임을 시작할 수 있습니다."
       );
       return;
     }
@@ -1067,7 +1238,40 @@ export default function IndiaQuestBoardGame() {
         double: false,
       }))
     );
-    setMessage("팀별 링크를 배분하고, 질문과 Bonus 설정을 완료하세요.");
+    setMessage("팀별 링크를 배분하고, 세계 음식 질문 2개와 Bonus 설정을 완료하세요.");
+  };
+
+  const replayGame = () => {
+    setBoardEvents(createBoardEvents(teamQuestions));
+    setTeams((prev) =>
+      prev.map((team) => ({ ...team, position: 0, score: 0 }))
+    );
+    setTeamStatus(
+      teams.map((team) => ({
+        teamId: team.id,
+        shield: false,
+        double: false,
+      }))
+    );
+    setTurn(0);
+    setDice(null);
+    setRollingDice(false);
+    setCurrentEvent(null);
+    setHasMoved(false);
+    setWinner(null);
+    setPhase("play");
+    setMessage(`${teams[0].name} 차례입니다. 주사위를 굴려 주세요!`);
+  };
+
+  const backToSetup = () => {
+    setPhase("setup");
+    setTurn(0);
+    setDice(null);
+    setRollingDice(false);
+    setCurrentEvent(null);
+    setHasMoved(false);
+    setWinner(null);
+    setMessage("질문과 Power-up을 확인한 뒤 다시 게임을 시작할 수 있습니다.");
   };
 
   const nextTurn = () => {
@@ -1332,7 +1536,16 @@ export default function IndiaQuestBoardGame() {
     const submission = teamSubmissions[teamOnlyIndex];
 
     return (
-      <div className="min-h-screen bg-[radial-gradient(circle_at_50%_0%,rgba(255,237,213,0.95),rgba(251,146,60,0.75)_35%,rgba(20,184,166,0.85)_90%)] p-4 text-slate-900">
+      <div
+        className="min-h-screen bg-orange-950 p-4 text-slate-900"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.16), rgba(255,255,255,0.16)), url('/world-food-main.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundAttachment: "fixed",
+        }}
+      >
         <div className="mx-auto max-w-3xl space-y-4">
           <Card className="rounded-[2rem] border-8 border-orange-100 bg-white/95 shadow-2xl">
             <CardContent className="p-6">
@@ -1344,17 +1557,16 @@ export default function IndiaQuestBoardGame() {
                 </span>
                 <div>
                   <p className="text-sm font-bold uppercase tracking-[0.3em] text-orange-700">
-                    Private Team Page
+                    World Food Question Lab
                   </p>
                   <h1 className="text-3xl font-black text-orange-950">
-                    {team.name} 질문 작성
+                    {team.name} 세계 음식 질문 만들기
                   </h1>
                 </div>
               </div>
 
               <p className="mt-4 rounded-2xl bg-orange-50 p-4 text-sm font-medium text-orange-900">
-                우리 팀의 질문과 Power-up만 보입니다. 질문은 정확히 2개
-                작성한 뒤 제출 버튼을 누르세요.
+                세계 음식에 관한 글을 읽고, 친구들이 글의 내용을 확인할 수 있는 영어 질문을 정확히 2개 만들어 보세요. 질문을 완성한 뒤 제출 버튼을 누르세요.
               </p>
             </CardContent>
           </Card>
@@ -1393,6 +1605,14 @@ export default function IndiaQuestBoardGame() {
                 </select>
               </div>
 
+              <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
+                <p className="font-black">Question Examples</p>
+                <p className="mt-1">• Where is this food from?</p>
+                <p>• What ingredients are in this food?</p>
+                <p>• How do people eat this food?</p>
+                <p>• Why is this food special?</p>
+              </div>
+
               <div className="rounded-2xl bg-slate-100 p-4 text-sm font-black text-slate-700">
                 질문 수: {questions.filter((q) => q.trim()).length} / 2개
               </div>
@@ -1417,7 +1637,7 @@ export default function IndiaQuestBoardGame() {
                         )
                       }
                       className="min-h-24 w-full rounded-2xl border border-slate-300 bg-white p-3 text-sm outline-none focus:border-orange-500"
-                      placeholder={`${team.name} ${questionIndex + 1}번 질문`}
+                      placeholder={`예: Where is this food from? (${questionIndex + 1})`}
                     />
                   </div>
                 ))}
@@ -1442,14 +1662,11 @@ export default function IndiaQuestBoardGame() {
 
               <button
                 type="button"
-                onClick={() => {
-                  alert("제출 버튼 클릭됨");
-                  submitTeamQuestions(teamOnlyIndex);
-                }}
+                onClick={() => submitTeamQuestions(teamOnlyIndex)}
                 className="flex w-full items-center justify-center rounded-2xl bg-red-600 px-4 py-4 text-lg font-black text-white shadow-lg transition hover:bg-red-700 active:scale-[0.98]"
               >
                 <CheckCircle2 className="mr-2 h-5 w-5" />
-                제출 테스트
+                질문 제출
               </button>
             </CardContent>
           </Card>
@@ -1459,12 +1676,16 @@ export default function IndiaQuestBoardGame() {
   }
 
   return (
-    <div className="min-h-screen overflow-hidden bg-orange-950 p-4 text-slate-900">
-      <div className="pointer-events-none fixed inset-0 opacity-90">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,237,213,0.95),rgba(251,146,60,0.56)_30%,rgba(20,184,166,0.58)_65%,rgba(76,29,149,0.9)_100%)]" />
-        <div className="absolute left-1/2 top-0 h-96 w-96 -translate-x-1/2 rounded-full bg-white/20 blur-3xl" />
-        <div className="absolute bottom-0 left-0 h-44 w-full bg-[linear-gradient(90deg,rgba(251,191,36,0.35),rgba(244,63,94,0.25),rgba(20,184,166,0.35))] blur-2xl" />
-      </div>
+    <div
+      className="min-h-screen overflow-hidden bg-orange-950 p-4 text-slate-900"
+      style={{
+        backgroundImage:
+          "linear-gradient(rgba(255,248,235,0.24), rgba(255,248,235,0.24)), url('/world-food-main.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed",
+      }}
+    >
 
       <div className="relative mx-auto max-w-7xl space-y-4">
         <div className="rounded-[2rem] border-8 border-orange-100 bg-orange-900/60 p-2 shadow-2xl">
@@ -1474,15 +1695,14 @@ export default function IndiaQuestBoardGame() {
                 <div className="flex items-center gap-2 text-orange-900">
                   <Sparkles className="h-6 w-6" />
                   <span className="text-sm font-bold uppercase tracking-[0.35em]">
-                    India Quest Board Game
+                    World Food Quest Board Game
                   </span>
                 </div>
                 <h1 className="mt-1 text-3xl font-black tracking-tight text-orange-950 md:text-5xl">
-                  India Quest Board
+                  World Food Quest
                 </h1>
                 <p className="mt-2 text-sm font-medium text-orange-900">
-                  15칸 보드판에서 12개 질문 칸과 3개 Bonus 칸으로
-                  플레이합니다.
+                  세계 음식 글을 읽고 팀별로 만든 12개 질문과 3개 Bonus 칸으로 플레이합니다.
                 </p>
               </div>
 
@@ -1520,8 +1740,7 @@ export default function IndiaQuestBoardGame() {
                     1단계: 팀별 링크 배분
                   </h2>
                   <p className="mt-1 text-sm text-slate-600">
-                    각 팀에게 자기 팀 링크만 보내면, 그 팀은 자기 질문 작성
-                    화면만 볼 수 있습니다.
+                    각 팀에게 자기 팀 링크를 보내면, 해당 팀은 세계 음식 글을 읽고 영어 질문 2개를 작성할 수 있습니다.
                   </p>
                 </div>
 
@@ -1668,14 +1887,11 @@ export default function IndiaQuestBoardGame() {
 
                       <button
                         type="button"
-                        onClick={() => {
-                          alert("교사 화면 제출 처리 버튼 클릭됨");
-                          submitTeamQuestions(teamIndex);
-                        }}
+                        onClick={() => submitTeamQuestions(teamIndex)}
                         className="mt-3 flex w-full items-center justify-center rounded-2xl bg-red-600 px-4 py-3 font-black text-white shadow-lg transition hover:bg-red-700 active:scale-[0.98]"
                       >
                         <CheckCircle2 className="mr-2 h-4 w-4" />
-                        이 팀 제출 테스트
+                        이 팀 질문 제출
                       </button>
                     </div>
                   ))}
@@ -1689,7 +1905,7 @@ export default function IndiaQuestBoardGame() {
                   className="rounded-2xl bg-orange-700 px-6 shadow-lg hover:bg-orange-800 disabled:opacity-50"
                 >
                   <Shuffle className="mr-2 h-4 w-4" />
-                  인도 보드게임 시작하기
+                  World Food Quest 시작하기
                 </Button>
               </div>
             </CardContent>
@@ -1697,7 +1913,7 @@ export default function IndiaQuestBoardGame() {
         )}
 
         <div className="grid gap-4 xl:grid-cols-[1fr_410px]">
-          <IndiaBoard boardEvents={boardEvents} teams={teams} turn={turn} />
+          <WorldFoodBoard boardEvents={boardEvents} teams={teams} turn={turn} />
 
           <div className="space-y-4">
             <Card className="rounded-[2rem] border-orange-200 bg-white/95 shadow-xl backdrop-blur">
@@ -1796,7 +2012,7 @@ export default function IndiaQuestBoardGame() {
                 </h2>
                 <p>보드판: 1~15번까지 총 15칸</p>
                 <p>질문 칸: 12개 / Bonus 칸: 3개</p>
-                <p>각 팀: 질문 2개 + Power-up 1개 설정 후 제출</p>
+                <p>각 팀: 세계 음식 영어 질문 2개 + Power-up 1개 설정 후 제출</p>
                 <p>주사위 값: 0, 1, 2, 3, 4, -1</p>
                 <p>Bonus 칸: 현재 팀이 선택한 Power-up 발동</p>
                 <p>성공: +10점, 더블 상태면 +20점</p>
@@ -1814,6 +2030,13 @@ export default function IndiaQuestBoardGame() {
         onSuccess={handleSuccess}
         onFail={handleFail}
         onClose={() => setCurrentEvent(null)}
+      />
+
+      <VictoryModal
+        winnerTeam={winnerTeam}
+        teams={teams}
+        onReplay={replayGame}
+        onBackToSetup={backToSetup}
       />
     </div>
   );
